@@ -1,25 +1,12 @@
-from fastapi import FastAPI 
+from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse 
+from movies_data import movies_list
+
+
 app = FastAPI()
 app.title = "Mi aplicacion con FastAPI movies"
 app.version = "0.0.1"
-movies_list = [
-    {
-        "id": 1,
-        "title": "Matrix",
-        "overview": "pelicula de ficcion ",
-        "year": "2001",
-        "rating": 9.5
-    },
-        {
-            "id": 2,
-            "title": "Juegos de Honor",
-            "overview": "Un recuento inspirador sobre el entrenador de básquetbol Ken Carte",
-            "year": "2005",
-            "rating": 9.8
-        }
-    
-]
+
 @app.get('/', tags=["Home"]) # definimos ruta
 def message ():
     #return {"Hello":"World"}
@@ -36,3 +23,27 @@ def get_movie(id: int):
         if item["id"] == id:
             return item
     return []
+
+@app.get('/movies/', tags = ["Movies"])
+def get_movies_by_category(category:str, year: int) :
+    return [item for item in movies_list if item["year"] == year]
+
+@app.post('/movies/', tags = ["Movies"])
+def create_movie(id:int=Body(),
+                 title: str = Body(),
+                 overview: str = Body(), 
+                 year:int = Body(),
+                 rating:float= Body(),
+                 category: str = Body()) :
+    movies_list.append({
+        "id": id,
+        "title": title,
+        "overview": overview,
+        "year": year,
+        "rating": rating,
+        "category": category
+    })
+    return movies_list
+
+
+
